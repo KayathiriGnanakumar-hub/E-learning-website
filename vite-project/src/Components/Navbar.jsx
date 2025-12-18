@@ -1,52 +1,65 @@
-import { useState } from "react";
-import logo2 from "../assets/logo2.png";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   return (
-    <nav className="fixed top-0 w-full h-[96px] z-50">
-      <div className="max-w-7xl mx-auto px-2 h-full flex items-center justify-between">
-
-        {/* LOGO - LEFT CORNER */}
-        <div className="flex items-center h-full">
-          <div className="h-[64px] w-[64px] overflow-hidden rounded-xl hover:scale-105 transition">
-            <img
-              src={logo2}
-              alt="Learnix Logo"
-              className="h-full w-full object-contain"
-            />
-          </div>
+    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur shadow z-50">
+      <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+        
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-11 h-11 text-indigo-600"
+          >
+            <path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2z" />
+            <path d="M11 12.98L3 9v6l8 4 8-4V9l-8 3.98z" />
+          </svg>
+          <h1 className="text-3xl font-bold text-indigo-600">Learnix</h1>
         </div>
 
-        {/* DESKTOP LINKS */}
-        <div className="hidden md:flex space-x-6 font-medium text-black">
-          <a href="#home" className="hover:text-indigo-600">Home</a>
-          <a href="#courses" className="hover:text-indigo-600">Courses</a>
-          <a href="#register" className="hover:text-indigo-600">Register</a>
-          <a href="#login" className="hover:text-indigo-600">Login</a>
-          <a href="#contact" className="hover:text-indigo-600">Contact</a>
-        </div>
+        {/* Links */}
+        <div className="hidden md:flex items-center gap-8 text-lg font-medium">
 
-        {/* MOBILE MENU BUTTON */}
-        <button
-          className="md:hidden text-2xl text-indigo-600"
-          onClick={() => setOpen(!open)}
-        >
-          ☰
-        </button>
+          {isHome && (
+            <>
+              <a href="#home" className="hover:text-indigo-600">Home</a>
+              <a href="#courses" className="hover:text-indigo-600">Courses</a>
+              <a href="#register" className="hover:text-indigo-600">Register</a>
+              <a href="#login" className="hover:text-indigo-600">Login</a>
+              <a href="#contact" className="hover:text-indigo-600">Contact</a>
+            </>
+          )}
+
+          {/* ✅ MODERN CART ICON */}
+          <Link to="/cart" className="relative group">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.6}
+              stroke="currentColor"
+              className="w-7 h-7 text-gray-700 group-hover:text-indigo-600 transition"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 3h1.386a.75.75 0 01.728.586L5.25 7.5m0 0h13.5l-1.35 6.75a.75.75 0 01-.735.6H8.25a.75.75 0 01-.735-.6L5.25 7.5zM8.25 21a.75.75 0 100-1.5.75.75 0 000 1.5zm9 0a.75.75 0 100-1.5.75.75 0 000 1.5z"
+              />
+            </svg>
+
+            {/* Badge (0 for now, future-ready) */}
+            <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs font-semibold w-5 h-5 rounded-full flex items-center justify-center">
+              0
+            </span>
+          </Link>
+
+        </div>
       </div>
-
-      {/* MOBILE MENU */}
-      {open && (
-        <div className="md:hidden px-6 py-4 space-y-3 font-medium bg-white shadow">
-          <a href="#home" className="block hover:text-indigo-600">Home</a>
-          <a href="#courses" className="block hover:text-indigo-600">Courses</a>
-          <a href="#register" className="block hover:text-indigo-600">Register</a>
-          <a href="#login" className="block hover:text-indigo-600">Login</a>
-          <a href="#contact" className="block hover:text-indigo-600">Contact</a>
-        </div>
-      )}
     </nav>
   );
 }

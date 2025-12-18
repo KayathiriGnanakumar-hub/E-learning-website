@@ -18,8 +18,10 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center text-white">
+        
+        {/* UPDATED HEADING */}
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-          Learn. Grow. <span className="text-indigo-300">Succeed.</span>
+          Slow & Steady <span className="text-indigo-300">Leads to Success</span>
         </h1>
 
         <p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-gray-200 mb-10">
