@@ -47,9 +47,9 @@ export default function Footer() {
             Contact
           </h3>
           <ul className="space-y-2 text-sm">
-            <li>📍 Chennai, India</li>
-            <li>📧 support@eduprime.com</li>
-            <li>📞 +91 98765 43210</li>
+            <li>Chennai, India</li>
+            <li>support@learnix.com</li>
+            <li>+91 98765 43210</li>
           </ul>
         </div>
 

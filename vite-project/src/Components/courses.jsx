@@ -1,80 +1,73 @@
-import dbms from "../assets/dbms.jpg";
-import devops from "../assets/devops.jpg";
-import dsa from "../assets/dsa.jpg";
-import java from "../assets/java.jpg";
-import jquery from "../assets/jquery.jpg";
-import js from "../assets/js.jpg";
-import ml from "../assets/ml.jpg";
-import mobile from "../assets/mobile.jpg";
-import python from "../assets/python.jpg";
-import reactImg from "../assets/reactImg.jpg"
-import ui from "../assets/ui.jpg";
-import backend from "../assets/backend.jpg";
-import cloud from "../assets/cloud.jpg";
-import angular from "../assets/angular.jpg";
-import cyber from "../assets/cyber.jpg";
-import test from "../assets/test.jpg";
-
-const courses = [
-  { title: "DBMS", image: dbms, price: "₹499" },
-  { title: "DevOps", image: devops, price: "₹699" },
-  { title: "DSA", image: dsa, price: "₹599" },
-  { title: "Java", image: java, price: "₹499" },
-  { title: "jQuery", image: jquery, price: "₹399" },
-  { title: "JavaScript", image: js, price: "₹499" },
-  { title: "Machine Learning", image: ml, price: "₹799" },
-  { title: "Mobile Development", image: mobile, price: "₹699" },
-  { title: "Python", image: python, price: "₹499" },
-  { title: "React", image: reactImg, price: "₹599" },
-  { title: "UI / UX", image: ui, price: "₹399" },
-  { title: "Backend Development", image: backend, price: "₹599" },
-  { title: "Cloud Computing", image: cloud, price: "₹699" },
-  { title: "Angular", image: angular, price: "₹599" },
-  { title: "Cyber Security", image: cyber, price: "₹699" },
-  { title: "Software Testing", image: test, price: "₹499" },
-
-
-];
+import { Link } from "react-router-dom";
+import courseData from "../data/courseData";
 
 export default function Courses() {
   return (
-    <div id="courses">
-      {/* PAGE TITLE */}
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
+    <section id="courses" className="pt-28 pb-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6">
+
+        {/* TITLE */}
+        <h1
+          className="text-3xl md:text-4xl font-extrabold text-center
+          text-indigo-700 mb-10 tracking-tight"
+        >
           Our Courses
         </h1>
-      </div>
 
-      {/* COURSES GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {courses.map((course, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
-          >
-            <div className="h-32 sm:h-36 mb-3 overflow-hidden rounded-md">
-              <img
-                src={course.image}
-                alt={course.title}
-                className="w-full h-full object-cover"
-              />
+        {/* GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {courseData.map((course) => (
+            <div
+              key={course.id}
+              className="bg-white rounded-xl shadow hover:shadow-lg
+              transition p-4 flex flex-col"
+            >
+              {/* IMAGE */}
+              <div className="h-36 mb-4 overflow-hidden rounded-xl">
+                <img
+                  src={course.image}
+                  alt={course.title}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+              </div>
+
+              {/* COURSE NAME – FONT STYLE IMPROVED */}
+              <h3
+                className="text-[15px] font-semibold tracking-wide
+                text-indigo-700 mb-2 leading-snug"
+              >
+                {course.title}
+              </h3>
+
+              {/* START DATE */}
+              <p className="text-xs text-gray-500 mb-1 font-medium tracking-wide">
+                Starts on{" "}
+                <span className="text-gray-700 font-semibold">
+                  {course.startDate}
+                </span>
+              </p>
+
+              {/* PRICE */}
+              <p className="text-purple-700 font-bold text-sm mb-4 tracking-wide">
+                {course.price}
+              </p>
+
+              {/* ENROLL BUTTON */}
+              <Link
+                to={`/course/${course.id}`}
+                className="mt-auto text-center
+                border-2 border-indigo-700 text-indigo-700
+                py-2 rounded-lg text-sm font-semibold
+                tracking-wide
+                hover:bg-indigo-700 hover:text-white
+                transition"
+              >
+                Enroll Now
+              </Link>
             </div>
-
-            <h3 className="text-sm font-semibold mb-1 flex-grow">
-              {course.title}
-            </h3>
-
-            <p className="text-purple-700 text-sm mb-3">
-              {course.price}
-            </p>
-
-            <button className="w-full bg-purple-700 text-white py-2 rounded-md text-sm hover:bg-purple-800 transition">
-              Enroll
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

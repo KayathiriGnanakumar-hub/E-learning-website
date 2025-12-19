@@ -7,6 +7,7 @@ import Login from "./Components/Login";
 import Contact from "./Components/Contact";
 import Cart from "./Components/Cart";
 import Footer from "./Components/Footer";
+import CourseDetails from "./Components/CourseDetails"; // ✅ NEW
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <Navbar />
 
       <Routes>
+        {/* HOME PAGE */}
         <Route
           path="/"
           element={
@@ -26,6 +28,11 @@ export default function App() {
             </>
           }
         />
+
+        {/* COURSE DETAILS PAGE */}
+        <Route path="/course/:id" element={<CourseDetails />} />
+
+        {/* CART PAGE */}
         <Route path="/cart" element={<Cart />} />
       </Routes>
 
