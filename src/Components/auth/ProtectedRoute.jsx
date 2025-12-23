@@ -40,7 +40,7 @@ export default function ProtectedRoute({ children, allowedRole }) {
     );
   }
 
-  // ❌ Not authorized → redirect
+  // ❌ Not authorized → 
   if (!authorized) {
     return <Navigate to="/" replace />;
   }
