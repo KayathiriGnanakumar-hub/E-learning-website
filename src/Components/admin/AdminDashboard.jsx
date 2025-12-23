@@ -40,28 +40,13 @@ export default function AdminDashboard() {
         Admin Dashboard
       </h1>
       <p className="text-gray-600 mb-8">
-        Overview of platform statistics and activity
+        Platform statistics overview
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card
-          title="Total Courses"
-          value={totalCourses}
-          icon={<FaBook />}
-          color="bg-indigo-600"
-        />
-        <Card
-          title="Total Students"
-          value={totalStudents}
-          icon={<FaUserGraduate />}
-          color="bg-green-600"
-        />
-        <Card
-          title="Total Enrollments"
-          value={totalEnrollments}
-          icon={<FaClipboardList />}
-          color="bg-purple-600"
-        />
+        <Card title="Total Courses" value={totalCourses} icon={<FaBook />} color="bg-indigo-600" />
+        <Card title="Total Students" value={totalStudents} icon={<FaUserGraduate />} color="bg-green-600" />
+        <Card title="Total Enrollments" value={totalEnrollments} icon={<FaClipboardList />} color="bg-purple-600" />
       </div>
     </div>
   );
