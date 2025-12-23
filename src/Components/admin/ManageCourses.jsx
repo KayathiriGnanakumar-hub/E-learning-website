@@ -1,89 +1,71 @@
-import { useEffect, useState } from "react";
-import courseData from "../../data/courseData";
+import { useState, useEffect } from "react";
+import { db } from "../../firebase";
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 
-export default function ManageCourses() {
+const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
-  const [editingId, setEditingId] = useState("");
-  const [form, setForm] = useState({
+  const [newCourse, setNewCourse] = useState({
     title: "",
+    description: "",
     price: "",
-    duration: "",
     image: "",
+    instructor: ""
   });
 
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("admin_courses"));
-    if (stored && stored.length > 0) {
-      setCourses(stored);
-    } else {
-      setCourses(courseData);
-      localStorage.setItem("admin_courses", JSON.stringify(courseData));
-    }
-  }, []);
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const saveCourse = (e) => {
-    e.preventDefault();
-    if (!form.title || !form.price || !form.duration) return;
-
-    let updated;
-    if (editingId) {
-      updated = courses.map((c) =>
-        String(c.id) === editingId ? { ...c, ...form } : c
-      );
-    } else {
-      updated = [...courses, { id: Date.now().toString(), ...form }];
-    }
-
-    setCourses(updated);
-    localStorage.setItem("admin_courses", JSON.stringify(updated));
-    setForm({ title: "", price: "", duration: "", image: "" });
-    setEditingId("");
+  // Fetch all courses from Firestore
+  const fetchCourses = async () => {
+    const data = await getDocs(collection(db, "courses"));
+    setCourses(data.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
   };
 
-  const deleteCourse = (id) => {
-    if (!window.confirm("Delete this course?")) return;
-    const updated = courses.filter((c) => String(c.id) !== String(id));
-    setCourses(updated);
-    localStorage.setItem("admin_courses", JSON.stringify(updated));
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  // Add new course
+  const handleAddCourse = async () => {
+    await addDoc(collection(db, "courses"), newCourse);
+    alert("Course added!");
+    setNewCourse({ title: "", description: "", price: "", image: "", instructor: "" });
+    fetchCourses();
+  };
+
+  // Delete course
+  const handleDeleteCourse = async (id) => {
+    await deleteDoc(doc(db, "courses", id));
+    fetchCourses();
   };
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Manage Courses</h1>
+      <h1>Manage Courses</h1>
 
-      <form onSubmit={saveCourse} className="bg-white p-6 rounded-2xl shadow mb-8">
-        <h2 className="font-semibold mb-4 text-indigo-700">
-          {editingId ? "Edit Course" : "Add Course"}
-        </h2>
+      <div>
+        <h3>Add New Course</h3>
+        <input placeholder="Title" value={newCourse.title} onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })} />
+        <input placeholder="Description" value={newCourse.description} onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })} />
+        <input placeholder="Price" value={newCourse.price} onChange={(e) => setNewCourse({ ...newCourse, price: e.target.value })} />
+        <input placeholder="Image URL" value={newCourse.image} onChange={(e) => setNewCourse({ ...newCourse, image: e.target.value })} />
+        <input placeholder="Instructor" value={newCourse.instructor} onChange={(e) => setNewCourse({ ...newCourse, instructor: e.target.value })} />
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <input name="title" placeholder="Title" className="border p-2 rounded" onChange={handleChange} value={form.title} />
-          <input name="price" placeholder="Price" className="border p-2 rounded" onChange={handleChange} value={form.price} />
-          <input name="duration" placeholder="Duration" className="border p-2 rounded" onChange={handleChange} value={form.duration} />
-          <input name="image" placeholder="Image URL" className="border p-2 rounded" onChange={handleChange} value={form.image} />
-        </div>
-
-        {form.image && <img src={form.image} alt="preview" className="mt-4 h-32 rounded" />}
-
-        <button className="mt-4 w-full bg-indigo-600 text-white py-2 rounded">
-          {editingId ? "Update" : "Add"}
-        </button>
-      </form>
-
-      <div className="bg-white p-6 rounded-2xl shadow">
-        {courses.map((c) => (
-          <div key={c.id} className="flex justify-between border-b py-3">
-            <div>
-              <p className="font-medium">{c.title}</p>
-              <p className="text-sm text-gray-500">{c.duration} • {c.price}</p>
-            </div>
-            <button onClick={() => deleteCourse(c.id)} className="text-red-600">Delete</button>
-          </div>
-        ))}
+        <button onClick={handleAddCourse}>Add Course</button>
       </div>
+
+      <hr />
+
+      <h3>All Courses</h3>
+      {courses.map((course) => (
+        <div key={course.id} style={{ border: "1px solid black", marginBottom: "10px", padding: "10px" }}>
+          <h4>{course.title}</h4>
+          <p>{course.description}</p>
+          <p>₹{course.price}</p>
+          <img src={course.image} alt="" width="150" />
+
+          <button onClick={() => handleDeleteCourse(course.id)}>Delete</button>
+        </div>
+      ))}
     </div>
   );
-}
+};
+
+export default ManageCourses;

@@ -1,5 +1,5 @@
-import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
@@ -16,12 +16,18 @@ export default function ProtectedRoute({ children, allowedRole }) {
         return;
       }
 
-      const userDoc = await getDoc(doc(db, "users", user.uid));
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-      if (userDoc.exists()) {
-        const { role } = userDoc.data();
-        setAuthorized(role === allowedRole);
-      } else {
+        if (userSnap.exists()) {
+          const { role } = userSnap.data();
+          setAuthorized(role === allowedRole);
+        } else {
+          setAuthorized(false);
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
         setAuthorized(false);
       }
 
@@ -31,20 +37,20 @@ export default function ProtectedRoute({ children, allowedRole }) {
     return () => unsubscribe();
   }, [allowedRole]);
 
-  // ✅ FIX: show loading UI
+  // ⏳ While checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-indigo-600 font-semibold">
-        Checking access...
+        Verifying access...
       </div>
     );
   }
 
-  // ❌ Not authorized → redirect to home
+  // ❌ Not authorized
   if (!authorized) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
-  // ✅ Authorized → render page
+  // ✅ Authorized
   return children;
 }

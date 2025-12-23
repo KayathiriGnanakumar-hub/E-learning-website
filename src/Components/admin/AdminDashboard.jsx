@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaBook, FaUserGraduate, FaClipboardList } from "react-icons/fa";
-import courseData from "../../data/courseData";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 
 export default function AdminDashboard() {
   const [totalCourses, setTotalCourses] = useState(0);
@@ -8,18 +9,26 @@ export default function AdminDashboard() {
   const [totalEnrollments, setTotalEnrollments] = useState(0);
 
   useEffect(() => {
-    setTotalCourses(courseData.length);
+    const fetchStats = async () => {
+      // ✅ Fetch courses from Firestore
+      const courseSnapshot = await getDocs(collection(db, "courses"));
+      setTotalCourses(courseSnapshot.size);
 
-    let students = localStorage.getItem("total_students");
-    if (!students) {
-      localStorage.setItem("total_students", "120");
-      students = "120";
-    }
-    setTotalStudents(Number(students));
+      // ✅ Dummy students count (temporary)
+      let students = localStorage.getItem("total_students");
+      if (!students) {
+        localStorage.setItem("total_students", "120");
+        students = "120";
+      }
+      setTotalStudents(Number(students));
 
-    const enrolled =
-      JSON.parse(localStorage.getItem("enrolled_courses")) || [];
-    setTotalEnrollments(enrolled.length);
+      // ✅ Enrollments (local for now)
+      const enrolled =
+        JSON.parse(localStorage.getItem("enrolled_courses")) || [];
+      setTotalEnrollments(enrolled.length);
+    };
+
+    fetchStats();
   }, []);
 
   const Card = ({ title, value, icon, color }) => (
@@ -44,9 +53,24 @@ export default function AdminDashboard() {
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card title="Total Courses" value={totalCourses} icon={<FaBook />} color="bg-indigo-600" />
-        <Card title="Total Students" value={totalStudents} icon={<FaUserGraduate />} color="bg-green-600" />
-        <Card title="Total Enrollments" value={totalEnrollments} icon={<FaClipboardList />} color="bg-purple-600" />
+        <Card
+          title="Total Courses"
+          value={totalCourses}
+          icon={<FaBook />}
+          color="bg-indigo-600"
+        />
+        <Card
+          title="Total Students"
+          value={totalStudents}
+          icon={<FaUserGraduate />}
+          color="bg-green-600"
+        />
+        <Card
+          title="Total Enrollments"
+          value={totalEnrollments}
+          icon={<FaClipboardList />}
+          color="bg-purple-600"
+        />
       </div>
     </div>
   );

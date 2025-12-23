@@ -1,66 +1,89 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import courseData from "../data/courseData";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function Courses() {
-  // Always read fresh from localStorage
-  const adminCourses = JSON.parse(localStorage.getItem("admin_courses"));
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fallback if admin has not added courses
-  const courses =
-    Array.isArray(adminCourses) && adminCourses.length > 0
-      ? adminCourses
-      : courseData;
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "courses"));
+        const list = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setCourses(list);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="pt-28 text-center text-gray-600">
+        Loading courses...
+      </section>
+    );
+  }
 
   return (
     <section id="courses" className="pt-28 pb-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
-        <h1 className="text-2xl font-bold mb-8 text-slate-900 text-center">
+
+        <h1 className="text-3xl md:text-4xl font-extrabold text-center text-indigo-700 mb-10">
           Our Courses
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {courses.map((course) => (
-            <div
-              key={course.id}
-              className="bg-white rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
-            >
-              <div className="h-36 mb-3 overflow-hidden rounded-lg bg-gray-100">
-                {course.image ? (
+        {courses.length === 0 ? (
+          <p className="text-center text-gray-500">
+            No courses available
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {courses.map(course => (
+              <div
+                key={course.id}
+                className="bg-white rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
+              >
+                <div className="h-36 mb-4 overflow-hidden rounded-xl">
                   <img
                     src={course.image}
                     alt={course.title}
                     className="w-full h-full object-cover"
                   />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                    No Image
-                  </div>
-                )}
+                </div>
+
+                <h3 className="text-[15px] font-semibold text-indigo-700 mb-2">
+                  {course.title}
+                </h3>
+
+                <p className="text-xs text-gray-500 mb-1">
+                  Duration: <span className="font-semibold">{course.duration}</span>
+                </p>
+
+                <p className="text-purple-700 font-bold text-sm mb-4">
+                  ₹{course.price}
+                </p>
+
+                <Link
+                  to={`/course/${course.id}`}
+                  className="mt-auto text-center border-2 border-indigo-700 text-indigo-700
+                  py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 hover:text-white transition"
+                >
+                  View Details
+                </Link>
               </div>
-
-              <h3 className="font-semibold text-sm mb-1 text-gray-800">
-                {course.title}
-              </h3>
-
-              <p className="text-xs text-gray-500 mb-1">
-                Duration: {course.duration}
-              </p>
-
-              <p className="text-indigo-700 font-semibold mb-3">
-                {course.price}
-              </p>
-
-              <Link
-                to={`/course/${course.id}`}
-                className="mt-auto px-6 py-3 rounded-lg text-white font-semibold
-                bg-gradient-to-r from-indigo-600 to-purple-600
-                hover:from-indigo-700 hover:to-purple-700 transition"
-              >
-                Enroll
-              </Link>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

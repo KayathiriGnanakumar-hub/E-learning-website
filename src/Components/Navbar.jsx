@@ -1,22 +1,38 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { FiShoppingCart } from "react-icons/fi";
 import { getCartCount } from "../utils/cartStorage";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const location = useLocation();
 
-  // Scroll only for HOME sections
+  const [user, setUser] = useState(null);
+
+  // 🔐 LISTEN TO AUTH STATE (BACKEND LOGIC)
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // 🔓 LOGOUT (FIREBASE)
+  const logout = async () => {
+    await signOut(auth);
+    navigate("/login");
+  };
+
+  // ⭐ SMART SCROLL HANDLER
   const goToSection = (id) => {
-    setOpen(false);
-
     if (location.pathname !== "/") {
       navigate("/");
       setTimeout(() => {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+      }, 300);
     } else {
       document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     }
@@ -28,37 +44,38 @@ export default function Navbar() {
 
         {/* LOGO */}
         <div
-          className="text-2xl font-bold text-indigo-600 cursor-pointer"
-          onClick={() => navigate("/")}
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => goToSection("home")}
         >
-          Learnix
+          <img src="/logo.png" alt="Learnix" className="h-8" />
+          <span className="text-xl font-bold text-indigo-600">Learnix</span>
         </div>
 
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex gap-6 font-medium items-center">
-          <span onClick={() => goToSection("home")} className="cursor-pointer">
-            Home
-          </span>
+        {/* MENU */}
+        <div className="flex items-center gap-6 font-medium">
+          <button onClick={() => goToSection("home")}>Home</button>
+          <button onClick={() => goToSection("courses")}>Courses</button>
+          <button onClick={() => goToSection("contact")}>Contact</button>
 
-          <span onClick={() => goToSection("courses")} className="cursor-pointer">
-            Courses
-          </span>
-
-          <span onClick={() => goToSection("contact")} className="cursor-pointer">
-            Contact
-          </span>
-
-          {/* ROUTE-BASED NAVIGATION */}
-          <span onClick={() => navigate("/register")} className="cursor-pointer">
-            Register
-          </span>
-
-          <span onClick={() => navigate("/login")} className="cursor-pointer">
-            Login
-          </span>
+          {!user ? (
+            <>
+              <Link to="/register">Register</Link>
+              <Link to="/login">Login</Link>
+            </>
+          ) : (
+            <>
+              <span className="text-sm text-gray-600">{user.email}</span>
+              <button
+                onClick={logout}
+                className="text-red-600 text-sm"
+              >
+                Logout
+              </button>
+            </>
+          )}
 
           <Link to="/cart" className="relative">
-            <FiShoppingCart className="text-xl" />
+            <FiShoppingCart size={20} />
             {getCartCount() > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white
               text-xs w-5 h-5 flex items-center justify-center rounded-full">
@@ -68,35 +85,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* MOBILE MENU BUTTON */}
-        <button
-          className="md:hidden text-2xl"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? "✕" : "☰"}
-        </button>
       </div>
-
-      {/* MOBILE MENU */}
-      {open && (
-        <div className="md:hidden bg-white px-6 pb-4">
-          <p onClick={() => goToSection("home")} className="py-2">Home</p>
-          <p onClick={() => goToSection("courses")} className="py-2">Courses</p>
-          <p onClick={() => goToSection("contact")} className="py-2">Contact</p>
-
-          <p onClick={() => navigate("/register")} className="py-2">
-            Register
-          </p>
-
-          <p onClick={() => navigate("/login")} className="py-2">
-            Login
-          </p>
-
-          <Link to="/cart" className="py-2 block">
-            Cart ({getCartCount()})
-          </Link>
-        </div>
-      )}
     </nav>
   );
 }
